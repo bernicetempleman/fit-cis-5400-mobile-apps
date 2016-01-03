@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+  <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+
+<body>
+
+  <div data-role="page" id="pageone">
+    <div data-role="header">
+      <h1>Project 1</h1>
+    </div>
+
+    <div data-role="main" class="ui-content">
+      <form method="post" action="demoform.asp">
+        <fieldset class="ui-field-contain">
+          <label for="recipe">Select Recipe</label>
+          <select name="recipe" id="number">
+            <option value="1">Super Shake</option>
+            <option value="2">Amazing Greens</option>
+            <option value="3">Lentil Curry</option>
+            <option value="4">Healthy Hot Chocolate</option>
+          </select>
+        </fieldset>
+    </div>
+
+
+    <a href="#pagetwo">Go to Page Two</a>
+  </div>
+  <div data-role="page" id="pagetwo">
+    <div data-role="header">
+      <h1>Welcome To My Recipes</h1>
+    </div>
+
+    <h2>Recipe Ingredients:</h2>
+    <ol data-role="listview">
+      <li><a href="#"> vegetables</a></li>
+      <li><a href="#">fruit</a></li>
+      <li><a href="#">protein</a></li>
+    </ol>
+
+    <label for="fullname">Full name:</label>
+    <input type="text" name="fullname" id="fullname">
+    <label for="rating">Rating:</label>
+    <input type="rating" name="rating" id="rating" placeholder="Your rating..">
+
+    <a href="#pageone">Go to Page One</a>
+  </div>
+
+  </form>
+  </div>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Final Project - FIT Campus Tour</title>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+  <meta name="viewport" id="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <link rel="stylesheet" type="text/css" href="css/topcoat-mobile-light.min.css">
+
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+
+  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+
+  <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+
+  <script type="text/javascript" src="SharedPref.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+
+  <script src="http://maps.googleapis.com/maps/api/js"></script>
+
+  <script type="text/javascript" charset="utf-8">
+    //************************************************
+    // Bernice Templeman
+    // CIS 5400 Final Project
+    // Dec 06, 2015
+    // Resources:
+    // media: //https://cordova.apache.org/docs/en/2.4.0/cordova/media/media.play.html
+    // Events: Apache Cordova API Cookbook
+    // Splash Screen: Apache Cordova API Cookbook
+    // Geolocation: Apache Cordova API Cookbook
+    // Google Static Maps: Google
+    // Camera: Apache Cordova API Cookbook
+    // Media: based on code from https://cordova.apache.org/docs/en/1.6.0/cordova/media/media.play.html
+    // Media: fix from //http://community.phonegap.com/nitobi/topics/phonegap_media_player_problems
+    // Media: Bernice Templeman: added resume function
+    // Accelerometer: https://github.com/cfjedimaster/DevelopingMobileAppsWithPhoneGap/blob/master/labs/6_accelerometer/test.html
+    // Capture: Apache Cordova API Cookbook
+    // Capture: http://www.raymondcamden.com/2015/06/05/cordova-sample-capture-and-display-video
+    // localStorage: 
+    //http://www.w3schools.com/html/html5_webstorage.asp
+    // Google dynamic Map API: http://www.w3schools.com/googleapi/default.asp
+    // Jquery Mobile: http://www.w3schools.com/jquery/default.asp
+    // html: http://www.w3schools.com/html/default.asp
+    // JavaScript: http://www.w3schools.com/js/default.asp
+    //************************************************
+          
+    //set the variables
+    var theTimer;	
+          //Cordova Ready variable, can't enable the watch until
+          //Cordova initializes
+    var cvaReady = false;
+          //LocationInfo portion of the page
+    var li;
+          //SkipAlert portion of the page
+    var skipAlert;
+          //The application's watchID, used to cancel it
+    var watchID;
+          //Location options object
+    var locationOptions;
+          //LastLongitude and LastLattitude variables.
+          //Used to determine whether location has changed
+    var lastLong, lastLat;
+          //Dialog constants
+    var alertTitle = "Geolocation";
+    var alertBtn = "Continue";
+    var lastX,lastY,lastZ;
+    var moveCounter = 0;
+    var my_media = null;
+    var mediaTimer = null;
+    
+    window.onerror = function(msg, url, line) 
+    {
+    	var resStr;
+         	var idx = url.lastIndexOf('/');
+         	if (idx > -1) 
+     	{
+         		url = url.substring(idx + 1);
+         	}
+    	resStr = 'ERROR in ' + url + ' on line ' + line + ': ' + msg;
+         console.error(resStr);
+         alert(resStr);
+         return false;
+    };
+    
+    // Events: Apache Cordova API Cookbookfunction onBodyLoad() 
+    {
+    	//Let the user know we've launched
+         alert("onBodyLoad");
+         
+    	//Set the Cordova deviceready event listener, 
+    	//so we'll know when Cordova is ready
+         document.addEventListener("deviceready", onDeviceReady, false);
+    }
+    
+    function onDeviceReady() 
+    {
+    	console.log("Entering onDeviceReady");
+            
+    	//Let the user know that the deviceReady event has fired
+         navigator.notification.alert("Cordova is ready", null, "FIT Tour", "Continue");
+            
+    	//Set the variable that lets other parts of the program
+         //know that Cordova has initialized
+         cvaReady = true;
+         
+    	shuffleNumber();
+    	navigator.accelerometer.watchAcceleration(gotMovement, errHandler,{frequency:200});	
+            
+    	//Get a handle we'll use to maipulate the geolocation
+         //content on the page
+         	li = document.getElementById('locationInfo');
+         	skipAlert = document.getElementById('skipAlert');
+            
+    	//Define the application's Geolocation Options
+         //only need to do this once, 
+    	//so that's why this is defined here
+         locationOptions = {
+         		maximumAge : 10000,
+              	timeout : 5000,
+              	enableHighAccuracy : true
+         };
+    
+        	console.log("Leaving onDeviceReady");
+    }// end on device Ready
+    
+    //****************************************************
+    // Splash Screen: Apache Cordova API Cookbook
+    function showSplashscreen() 
+    {
+    	console.log('Entering showSplashscreen');
+            
+    	//Show the splashscreen
+         navigator.splashscreen.show();
+    
+         //fire off a timer to hide the splashscreen in 5 seconds
+         theTimer = setInterval(onTimer, 5000);
+         console.log('Leaving showSplashscreen');
+    }
+    
+    function onTimer() 
+    {
+     	console.log('Entering onTimer');
+         if (theTimer) 
+    	{
+              //Kill the timer
+              window.clearInterval(theTimer);
+              theTimer = null;
+    
+              //Hide the splash screen
+              navigator.splashscreen.hide();
+         	}
+         	console.log('Leaving onTimer');
+    }//end ontimer
+    //****************************************************
+    // Geolocation: Apache Cordova API Cookbook
+    function startWatch() 
+    {
+    	console.log("Entering startWatch");
+            
+    	//Has Cordova initialized?
+        	if (cvaReady) 
+    	{
+          	//Do we have a watch already running?
+              	if (!watchID) 
+    		{
+                	//Update the screen 
+    			//so the user knows the watch is starting
+                	//Blank out any pevious skip alert warning
+                	skipAlert.innerHTML = "";
+                	//It might take a few seconds 
+    			//for the first results to appear
+                	li.innerHTML = 'Starting Watch';
+                	//start the watch
+                	watchID = navigator.geolocation.watchPosition(locationSuccess, locationError, locationOptions);
+              	} 
+    		else //watch running
+    		{
+                	console.log("Watch is already active");
+                	navigator.notification.alert("A watch is already enabled.\nPlease don't tap the Start button.", null, alertTitle, alertBtn);
+              	}
+      	} 
+    	else // cordova has not initialized
+    	{
+              console.log("Cordova is not ready");
+              navigator.notification.alert("Please wait until Cordova has initialized.", null, alertTitle, alertBtn);
+         	}
+        	console.log("Leaving startWatch");
+    }//end start watch
+    
+    function cancelWatch() 
+    {
+    	console.log("Entering cancelWatch");
+            
+    	//Do we have a watch active?
+         	if (watchID) 
+    	{
+         		//Clear the watch
+              	navigator.geolocation.clearWatch(watchID);
+              	//Clear the watch ID (just because)
+              	watchID = null;
+              	//Clear out the last location results
+              	li.innerHTML = '';
+              	//Blank out the skip alert warning
+              	skipAlert.innerHTML = "";
+              	navigator.notification.alert("Watch cancelled", null, alertTitle, alertBtn);
+       	} 
+    	else 
+    	{
+              	console.log("Watch not active");
+              	navigator.notification.alert("A watch is not active, nothing to cancel.\nPlease don't tap the Cancel button.", null, alertTitle, alertBtn);
+        	}
+         	console.log("Entering cancelWatch");
+    }// end cancelWatch
+    
+    function locationSuccess(loc) 
+    {
+    	function makeListItem(theLabel, theValue) {
+              console.log('Label: ' + theLabel);
+              console.log('Value: ' + theValue);
+              return '<li class="topcoat-list__item">' + theLabel + ': ' + theValue + '</li>';
+         	}
+    
+        	console.log("Entering locationSuccess");
+         //get the timestamp in a date object so we can work with it
+         var d = new Date(loc.timestamp);
+         //Check to see if the device has even moved
+         if (lastLat != loc.coords.latitude || lastLong != loc.coords.longitude) 
+    	{
+           	//Blank out the skip alert warning
+              	skipAlert.innerHTML = "";
+    
+              	var tmpStr;
+              	//Build the HTML block which will render 
+    		//the location reading
+    		tmpStr = '<h3>Location Reading</h3>';
+    
+              	tmpStr += makeListItem('Latitude', loc.coords.latitude);
+              	tmpStr += makeListItem('Longitude', loc.coords.longitude);
+              	tmpStr += '</ul>';
+              
+    		//replace the page content 
+    		// with the current location reading
+              	li.innerHTML = tmpStr;
+              	//Update the lastLat and lastLong variables
+              	lastLat = loc.coords.latitude;
+              	lastLong = loc.coords.longitude;
+         	} 
+    	else 
+    	{
+              	console.log("Skipping page update, location has not changed");
+              	skipAlert.innerHTML = "Skipping reading @ " + d.toLocaleTimeString();
+        	}
+         console.log("Entering locationSuccess");
+    }// end function 
+    
+    function locationError(errObj) 
+    {
+      	console.error("Entering locationError");
+         li.innerHTML = 'Error Reading Location';
+         console.error(JSON.stringify(errObj));
+    	//Do we have a watch active?
+    	if (watchID) 
+    	{
+           	console.log("Cancelling watch");
+              	//Clear the watch
+              	navigator.geolocation.clearWatch(watchID);
+              	//Clear the watch ID (just because)
+              	watchID = null;                 
+         }	
+       	navigator.notification.alert("Error: " + errObj.message + " (code: " + errObj.code + ")", null, alertTitle, alertBtn);
+        	console.error("Leaving locationError");
+    }
+    //***********************************************************
+    // Google Static Maps
+    function initialize()
+    {
+    	var mapProp = {
+        		center: new google.maps.LatLng(51.508742,-0.120850),
+        zoom:1,mapTypeId: google.maps.MapTypeId.ROADMAP};
+      	var map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
+    }//end initialize
+    
+    function loadScript()
+    {
+      	var script = document.createElement("script");
+      	script.type = "text/javascript";
+      	script.src = "http://maps.googleapis.com/maps/api/js?key=&sensor=false&callback=initialize";
+      	document.body.appendChild(script);
+    }
+    //window.onload = loadScript;
+    
+    //********************************************
+    // Bernice Templeman location alerts
+    function writeCookie1()
+    {
+    	window.alert("Botanical Garden Location is \nLatitude: 28.06621 \nLongitude: -80.62289");
+    }
+    
+    function writeCookie2()
+    {
+    	window.alert("The Quad Location is \nLatitude: 28.067731 \nLongitude:-80.623950");
+    }
+    
+    function writeCookie3()
+    {
+    	window.alert("The Panther Statue is Location\nLatitude: 28.066541 \nLongitude:-80.624143");
+    }
+    
+    function writeCookie4()
+    {
+    	window.alert("The Chinese Clock is Location is \nLatitude: 28.066292 \nLongitude:-80.624347");
+    }
+    
+    function writeCookie5()
+    {
+    	window.alert("CIS Location is \nLatitude: 28.064583 \nLongitude:-80.623876");
+    }
+    
+    function writeCookie6()
+    {
+    	window.alert("The Olin Engineering and Science Complex is  \nLatitude: 28.062808 \nLongitude:-80.624326");
+    }
+    
+    function writeCookie7()
+    {
+    	window.alert("The All Faiths Center is \nLatitude: 28.06001 \nLongitude: -80.62366");
+    }
+    
+    function writeCookie8()
+    {
+    	window.alert("The Panther Dining Hall is \nLatitude: 28.062420 \nLongitude:-80.622781");
+    }
+    
+    //**********************************************************
+    // Camera: Apache Cordova API Cookbook
+    function takePhoto() 
+    {
+       	console.log("Entering takePhoto");
+         navigator.camera.getPicture(cameraSuccess, cameraError1, 	{
+          	quality : 50,
+              	saveToPhotoAlbum : true,
+    sourceType : Camera.PictureSourceType.CAMERA,
+              	destinationType : Camera.DestinationType.FILE_URI
+            });
+       	console.log("Leaving takePhoto");
+    }
+    
+    function cameraSuccess(imageURL) 
+    {
+          console.log("Entering cameraSuccess");
+          console.log("Image URL: " + imageURL);
+            
+          //Get a handle to the image container div
+          ic = document.getElementById('imageContainer1');
+    
+          //Then write an image tag out to the div using the
+          //URL we received from the camera application.
+          ic.innerHTML = '<img src="' + imageURL + '" width="100%" />';
+          console.log("Leaving cameraSuccess0");
+    }
+    
+    function cameraError1(e) 
+    {
+            console.log("Entering cameraError");
+            console.error(JSON.stringify(e));
+            navigator.notification.alert(JSON.stringify(e), null, "Camera Error", "Continue");
+            console.log("Leaving cameraError");
+    }
+    //******************************************************* 
+    // Media: https://cordova.apache.org/docs/en/1.6.0/cordova/media/media.play.html
+    function playAudio(src) 
+    {
+    /*
+                if (my_media == null) {
+                    // Create Media object from src
+                    my_media = new Media(src, onSuccess, onError);
+                } // else play current audio
+    */
+    
+    //media fix from: 
+    //http://community.phonegap.com/nitobi/topics/phonegap_media_player_problems
+    	if(my_media != null)
+    	{
+    		my_media.release();
+    		my_media = null;
+    	}
+    
+    	// Create Media object from src
+    	my_media = new Media(src, onSuccess, onError);
+    
+    	my_media.seekTo(0);
+    
+    	// Play audio
+         my_media.play();
+    
+         // Update my_media position every second
+         if (mediaTimer == null) 
+    	{
+          	mediaTimer = setInterval(function() 
+    		{
+              		// get my_media position
+                   	my_media.getCurrentPosition(
+                    	// success callback
+                         function(position) 
+    				{
+                         		if (position > -1) 
+    					{
+                                	setAudioPosition((position) + " sec");
+                              	}
+                         },
+                         // error callback
+                         function(e) 
+    				{
+                           	console.log("Error getting pos=" + e);
+                              	setAudioPosition("Error: " + e);
+                         }
+                        );
+               }, 1000);
+         	}
+    }//end playAudio
+    
+    // Pause audio
+    function pauseAudio() 
+    {
+                if (my_media) {
+                    my_media.pause();
+                }
+            }
+    
+            // Stop audio
+            // 
+            function stopAudio() {
+                if (my_media) {
+                    my_media.stop();
+                }
+                clearInterval(mediaTimer);
+                mediaTimer = null;
+            }
+    
+    // Bernice Templeman 
+    function resumeAudio(src)
+    {
+    	if (my_media == null) 
+    	{
+         		// Create Media object from src
+               my_media = new Media(src, onSuccess, onError);
+         	} // else play current audio
+    
+         // Play audio
+         my_media.play();
+    
+         // Update my_media position every second
+         if (mediaTimer == null) 
+    	{
+          	mediaTimer = setInterval(function() 
+    		{
+               	// get my_media position
+                    my_media.getCurrentPosition(
+                    // success callback
+                    function(position) 
+    			{
+                    	if (position > -1) 
+    				{
+                         		setAudioPosition((position) + " sec");
+                         	}
+                    },
+                    // error callback
+                    function(e) 
+    			{
+                    	console.log("Error getting pos=" + e);
+                         	setAudioPosition("Error: " + e);
+                    }
+                    );
+               }, 1000);
+         	}
+    }
+    
+    // onSuccess Callback
+    function onSuccess() 
+    {
+       	console.log("playAudio():Audio Success");
+    }
+    
+    // onError Callback 
+    function onError(error) 
+    {
+      	alert('code: '    + error.code    + '\n' + 
+                      'message: ' + error.message + '\n');
+    }
+    
+    // Set audio position
+    function setAudioPosition(position) 
+    {
+      	document.getElementById('audio_position').innerHTML = position;
+    }
+    //******************************************************
+    //https://github.com/cfjedimaster/DevelopingMobileAppsWithPhoneGap/blob/master/labs/6_accelerometer/test.html
+    function errHandler(e) 
+    {
+    	console.log("--- ERROR ---");
+    	console.dir(e);
+    }
+    
+    function gotMovement(a) 
+    {
+    	if(!lastX) {
+    		lastX = a.x;
+    		lastY = a.y;
+    		lastZ = a.z;
+    		return;
+    	}
+    	var deltaX, deltaY, deltaZ;
+    	deltaX = Math.abs(a.x-lastX);
+    	deltaY = Math.abs(a.y-lastY);
+    	deltaZ = Math.abs(a.z-lastZ);
+    	if(deltaX + deltaY + deltaZ > 3) {
+    		moveCounter++;
+    	} else {
+    		moveCounter = Math.max(0, --moveCounter);
+    	}
+    	if(deltaX !=0 || deltaY != 0 || deltaZ != 0) console.log(deltaX,deltaY,deltaZ,moveCounter);
+    	if(moveCounter > 1) { shuffleNumber(); moveCounter=0; }
+    	lastX = a.x;
+    	lastY = a.y;
+    	lastZ = a.z;
+    }
+    
+    function shuffleNumber() 
+    {
+    	var newNum = getRandomInt(1,8);
+    	document.querySelector("#die").innerHTML = newNum;
+    }
+    
+    function getRandomInt(min, max) 
+    {
+      	return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    //****************************************************
+    // Capture: Apache Cordova API Cookbook
+    // Capture: http://www.raymondcamden.com/2015/06/05/cordova-sample-capture-and-display-video
+    function doCapture()
+    {
+    	console.log("Entering doCapture");
+    	//Capture Video
+    	console.log("Starting video capture");
+    	// limit capture operation to 1 video clip of low quality
+    
+    	var options = { limit: 1, quality: 0 };
+    	navigator.device.capture.captureVideo(captureSuccessV, captureError, options);	
+    }
+    
+    function captureSuccessV(s) 
+    {
+    	console.log("Success");
+    	console.dir(s[0]);
+    	var v = "<video controls='controls'>";
+    	v += "<source src='" + s[0].fullPath + "' type='video/mp4'>";
+    	v += "</video>";
+    	document.querySelector("#videoArea").innerHTML = v;
+    }
+    
+    // capture error callback
+    var captureError = function(error) 
+    {
+        	navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+    };
+    //******************************************************
+    // localStorage example from: 
+    //http://www.w3schools.com/html/html5_webstorage.asp
+    function clickCounter() {
+        if(typeof(Storage) !== "undefined") {
+            if (localStorage.clickcount) {
+                localStorage.clickcount = Number(localStorage.clickcount)+1;
+            } else {
+                localStorage.clickcount = 1;
+            }
+            document.getElementById("result").innerHTML = "Your favorite location is: " + localStorage.clickcount + ".";
+        } else {
+            document.getElementById("result").innerHTML = "Sorry, your browser does not support web storage...";
+        }
+    }
+    
+    function clickCounter2() {
+        if(typeof(Storage) !== "undefined") {
+            if (localStorage.clickcount) {
+                localStorage.clickcount = Number(localStorage.clickcount)-1;
+            } else {
+                localStorage.clickcount = 1;
+            }
+            document.getElementById("result").innerHTML = "Your favorite location is: " + localStorage.clickcount + ".";
+        } else {
+            document.getElementById("result").innerHTML = "Sorry, your browser does not support web storage...";
+        }
+    }
+    
+    function showclickCounter() {
+        if(typeof(Storage) !== "undefined") {
+            if (localStorage.clickcount) {
+                localStorage.clickcount = Number(localStorage.clickcount);
+            } else {
+                localStorage.clickcount = 0;
+            }
+            document.getElementById("result").innerHTML = "Your favorite location is: " + localStorage.clickcount + ".";
+        } else {
+            document.getElementById("result").innerHTML = "Sorry, your browser does not support web storage...";
+        }
+    }
+    //*****************************************************
+  </script>
+</head>
+
+<body onload="onBodyLoad()">
+
+  <div data-role="page" data-theme="b" id="home">
+
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>FIT Campus Tour</h1>
+      <a href="#about" data-icon="info" data-iconpos="notext">About</a>
+    </div>
+
+    <img src="https://maps.googleapis.com/maps/api/staticmap?center=28.0634181,-80.6233481&zoom=16&size=580x550&maptype=hybrid
+&markers=color:blue|label:1|28.06621, -80.62289&markers=color:green|label:2|28.067731, -80.623950
+&markers=color:yellow|label:4|28.066292, -80.624347
+&markers=color:yellow|label:7|28.06001, -80.62366
+&markers=color:blue|label:6|28.062808, -80.624326
+&markers=color:red|label:8|28.062420, -80.622781
+&markers=color:red|label:3|28.066541, -80.624143
+&markers=color:green|label:5|28.064583, -80.623876" height="auto" width="100%">
+
+    <h3>Where are you?&nbsp</h3>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button id="start" type="button" data-theme="b" onclick="startWatch();">Start</button>
+      </div>
+      <div class="ui-block-b">
+        <button id="finish" type="button" data-theme="b" onclick="cancelWatch();">Finish</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+
+    <p id="skipAlert"></p>
+    <p id="locationInfo">Click the Start button to get your current location reading.</p>
+
+    <h3>Where do you want to go?&nbsp</h3>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button data-theme="b" onclick="writeCookie1();">1</button>
+      </div>
+      <div class="ui-block-b">
+        <button data-theme="b" onclick="writeCookie2();">2</button>
+      </div>
+      <div class="ui-block-c">
+        <button data-theme="b" onclick="writeCookie3();">3</button>
+      </div>
+      <div class="ui-block-d">
+        <button data-theme="b" onclick="writeCookie4();">4</button>
+      </div>
+      <div class="ui-block-a">
+        <button data-theme="b" onclick="writeCookie5();">5</button>
+      </div>
+      <div class="ui-block-b">
+        <button data-theme="b" onclick="writeCookie6();">6</button>
+      </div>
+      <div class="ui-block-c">
+        <button data-theme="b" onclick="writeCookie7();">7</button>
+      </div>
+      <div class="ui-block-d">
+        <button data-theme="b" onclick="writeCookie8();">8</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+
+    <h3>Not Sure where to begin?</h3>
+    <p>Shake this device for a random number selection.</p>
+
+    <style type="text/css">
+      div.inline { float:left; }
+      .clearBoth { clear:both; }
+    </style>
+    <div class="inline" id="randomNumber">Your Random Number is:&nbsp </div>
+    <div class="inline" id="die"></div>
+    <br class="clearBoth" />
+
+    <h3>Which One is Your Favorite?&nbsp</h3>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button type="button" data-theme="b" onclick="showclickCounter();">Show Me</button>
+      </div>
+      <div class="ui-block-b">
+        <button type="button" data-theme="b" onclick="clickCounter();">+</button>
+      </div>
+      <div class="ui-block-c">
+        <button type="button" data-theme="b" onclick="clickCounter2();">-</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+
+    <div id="result"></div>
+
+    <h3> Want more Info about a location? </h3>
+    <p> Click the "Info" Button Below! </p>
+
+    <h3> Want to see your location on a map? </h3>
+    <p> Click the "Dynamic Map" Button Below! </p>
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- home -->
+
+  <div data-role="page" id="one">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Botanical Garden</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button id="play" type="button" data-theme="b" onclick="playAudio('/android_asset/www/botanicalgardens.mp3');">Play Audio</button>
+      </div>
+      <div class="ui-block-b">
+        <button id="pause" type="button" data-theme="b" onclick="pauseAudio();">Pause Audio</button>
+      </div>
+      <div class="ui-block-c">
+        <button id="stop" type="button" data-theme="b" onclick="stopAudio();">Stop Audio</button>
+      </div>
+      <div class="ui-block-d">
+        <button id="resume" type="button" data-theme="b" onclick="resumeAudio('/android_asset/www/botanicalgardens.mp3');">Resume</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+
+    <p id="audio_position"></p>
+
+
+    <img src="img/BotanicalGardensEntrance1.png" height="auto" width="100%">
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- Page One -->
+
+  <div data-role="page" id="two">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Quad</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button id="play" type="button" data-theme="b" onclick="playAudio('/android_asset/www/quad.mp3');">Play Audio</button>
+      </div>
+      <div class="ui-block-b">
+        <button id="pause" type="button" data-theme="b" onclick="pauseAudio();">Pause Audio</button>
+      </div>
+      <div class="ui-block-c">
+        <button id="stop" type="button" data-theme="b" onclick="stopAudio();">Stop Audio</button>
+      </div>
+      <div class="ui-block-d">
+        <button id="resume" type="button" data-theme="b" onclick="resumeAudio('/android_asset/www/quad.mp3');">Resume</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+
+    <p id="audio_position"></p>
+
+    <img src="img/quad.jpg" height="auto" width="100%">
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- Page Two -->
+
+  <div data-role="page" id="three">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Panther</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button id="play" type="button" data-theme="b" onclick="playAudio('/android_asset/www/panther.mp3');">Play Audio</button>
+      </div>
+      <div class="ui-block-b">
+        <button id="pause" type="button" data-theme="b" onclick="pauseAudio();">Pause Audio</button>
+      </div>
+      <div class="ui-block-c">
+        <button id="stop" type="button" data-theme="b" onclick="stopAudio();">Stop Audio</button>
+      </div>
+      <div class="ui-block-d">
+        <button id="resume" type="button" data-theme="b" onclick="resumeAudio('/android_asset/www/panther.mp3');">Resume</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+
+    <p id="audio_position"></p>
+
+    <img src="img/panther.jpg" height="auto" width="100%">
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- Page three-->
+
+  <div data-role="page" id="four">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Chinese Clock</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button id="play" type="button" data-theme="b" onclick="playAudio('/android_asset/www/clock.mp3');">Play Audio</button>
+      </div>
+      <div class="ui-block-b">
+        <button id="pause" type="button" data-theme="b" onclick="pauseAudio();">Pause Audio</button>
+      </div>
+      <div class="ui-block-c">
+        <button id="stop" type="button" data-theme="b" onclick="stopAudio();">Stop Audio</button>
+      </div>
+      <div class="ui-block-d">
+        <button id="resume" type="button" data-theme="b" onclick="resumeAudio('/android_asset/www/clock.mp3');">Resume </button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+
+    <p id="audio_position"></p>
+
+    <img src="img/clock.jpg" height="auto" width="100%">
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- Page four -->
+
+  <div data-role="page" id="five">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>CIS</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button id="play" type="button" data-theme="b" onclick="playAudio('/android_asset/www/cis.mp3');">Play Audio</button>
+      </div>
+      <div class="ui-block-b">
+        <button id="pause" type="button" data-theme="b" onclick="pauseAudio();">Pause Audio</button>
+      </div>
+      <div class="ui-block-c">
+        <button id="stop" type="button" data-theme="b" onclick="stopAudio();">Stop Audio</button>
+      </div>
+      <div class="ui-block-d">
+        <button id="resume" type="button" data-theme="b" onclick="resumeAudio('/android_asset/www/cis.mp3');">Resume</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+
+    <p id="audio_position"></p>
+
+    <img src="img/cis.jpg" height="auto" width="100%">
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- Page Five -->
+
+  <div data-role="page" id="six">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Engineering Complex</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button id="play" type="button" data-theme="b" onclick="playAudio('/android_asset/www/complex.mp3');">Play Audio</button>
+      </div>
+      <div class="ui-block-b">
+        <button id="pause" type="button" data-theme="b" onclick="pauseAudio();">Pause Audio</button>
+      </div>
+      <div class="ui-block-c">
+        <button id="stop" type="button" data-theme="b" onclick="stopAudio();">Stop Audio</button>
+      </div>
+      <div class="ui-block-d">
+        <button id="resume" type="button" data-theme="b" onclick="resumeAudio('/android_asset/www/complex.mp3');">Resume</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+
+    <p id="audio_position"></p>
+
+    <img src="img/complex.jpg" height="auto" width="100%">
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- Page six -->
+
+  <div data-role="page" id="seven">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>All Faiths Center</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button id="play" type="button" data-theme="b" onclick="playAudio('/android_asset/www/faith.mp3');">Play Audio</button>
+      </div>
+      <div class="ui-block-b">
+        <button id="pause" type="button" data-theme="b" onclick="pauseAudio();">Pause Audio</button>
+      </div>
+      <div class="ui-block-c">
+        <button id="stop" type="button" data-theme="b" onclick="stopAudio();">Stop Audio</button>
+      </div>
+      <div class="ui-block-d">
+        <button id="resume" type="button" data-theme="b" onclick="resumeAudio('/android_asset/www/faith.mp3');">Resume</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+
+    <p id="audio_position"></p>
+
+    <img src="img/faith.jpg" height="auto" width="100%">
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- Page Seven -->
+
+  <div data-role="page" id="eight">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Panther Dining Hall</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button id="play" type="button" data-theme="b" onclick="playAudio('/android_asset/www/dining.mp3');">Play Audio</button>
+      </div>
+      <div class="ui-block-b">
+        <button id="pause" type="button" data-theme="b" onclick="pauseAudio();">Pause Audio</button>
+      </div>
+      <div class="ui-block-c">
+        <button id="stop" type="button" data-theme="b" onclick="stopAudio();">Stop Audio</button>
+      </div>
+      <div class="ui-block-d">
+        <button id="resume" type="button" data-theme="b" onclick="resumeAudio('/android_asset/www/dining.mp3');">Resume</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+
+    <p id="audio_position"></p>
+
+    <img src="img/dining.jpg" height="auto" width="100%">
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- End Page Eight -->
+
+  <!-- Page About -->
+  <div data-role="page" id="about">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>About Me</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <h2>FIT Campus Tour App</h2> This is an application that uses the lessons from CIS 5400. It uses the following API from Cordova: Accelerometer, Camera, Capture, Events, File Permissions, Geolocation, Media, and Splash Screen.
+      <br>
+      <br> It also uses the JQuery Mobile interface library to enhance the Graphical User Interface of the Application.
+      <br>
+      <br>
+      <h3>The App:</h3>
+      <br> There is an icon with a picture of the Botanical Gardens. I changed the default icon and resized my picture to the appropriate sizes.
+      <br>
+      <br> When the Application opens a Splash Screen of the Botanical Gardens is displayed. This uses the Cordova function to display a splash screen from example 16.1. To change the default splash screen, I added my own picture to the application directories
+      and resized it to the different screen sizes.
+      <br>
+      <br> An event message is displayed for the Cordova &ldquo;onBodyLoad&rdquo; function from Cordova chapter 1. This function registers an event listener that calls the &ldquo;onDeviceReady&rdquo; function when the device is ready.
+      <br>
+      <br> When the device is ready, an event message is displayed to let you know the application is ready.
+      <br>
+      <br>
+      <h3>Home:</h3>
+      <br> The &ldquo;Home&rdquo; screen of the application displays a static google map of the FIT campus with markers at different locations.
+      <br>
+      <br> Home has:
+      <br> &ldquo;Start&rdquo; and &rdquo;Finish&rdquo; buttons to display your current location. This uses the Cordova Cookbook function from 11.2 to display the longitude and latitude. It watches your location.
+      <br>
+      <br> Location buttons for each location display the Location name, longitude and Latitude.
+      <br>
+      <br> A random location number is displayed based on a function that uses the Cordova Accelerometer.
+      <br>
+      <br> Favorite Location Buttons: &ldquo;Show&rdquo;, &ldquo;+&rdquo; and &ldquo;- &rdquo;, which enable you to select your favorite number. This is saved in local storage and will be there the next time you use the app.
+      <br>
+      <br> Header and Footer with links to home, back, and other pages.
+      <br>
+      <br>
+      <h3>About: </h3>
+      <br> Is a description of the App and Contact Information.
+      <br>
+      <br>
+      <h3>Photo: </h3>
+      <br> Enables the user to take a picture with the Camera API and display the most recent photo.
+      <br>
+      <br>
+      <h3>Video: </h3>
+      <br> Enables the user to make a video with the Capture API and displays the most recent video.
+      <br>
+      <br>
+      <h3>Info: </h3>
+      <br> Is a list of the locations which are linked to an individual page for each location with a recording about the location using the Media API and an image of the location. On each individual location page has the following buttons: &ldquo;Play Audio&rdquo;,
+      &ldquo;Pause Audio&rdquo;, &ldquo;Stop Audio&rdquo; and &ldquo;Resume&rdquo;.
+      <br>
+      <br>
+      <h3>Dynamic Map: </h3>
+      <br> Is a dynamic map of the FIT campus that also shows the users location. It has a &ldquo;Show Map&rdquo; button to display the Map.
+      <br>
+      <br>
+      <h3>Contact US:</h3>
+      <br> btempleman2015&#64;my.fit.edu
+      <br>
+      </p>
+    </div>
+    <!-- end About content -->
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- end about page -->
+
+  <!-- begin Page photo -->
+  <div data-role="page" id="photo">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Take a Picture</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <p>Your most recent picture taken here will appear here. Pictures will be saved with your other pictures on your mobile device.</p>
+    </div>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button data-theme="b" onclick="takePhoto();"> Take Picture</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+    <br>
+
+    <div id="imageContainer1"></div>
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- end photo page-->
+
+  <!-- Page Video -->
+  <div data-role="page" id="video">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Make a Video</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <p>Your most recent video made here will appear here. Videos will be saved with your other videos on your mobile device.</p>
+    </div>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button id="MakeVideo" type="button" data-theme="b" onclick="doCapture();">Make Video</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+    <br>
+
+    <div id="videoArea"></div>
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- end page video -->
+
+  <!-- Page info -->
+  <div data-role="page" id="info">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>More Info</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+
+    <h3> Want more Info? </h3>
+
+    <ul data-role="listview" data-filter="true" data-theme="b" input="#myFilter">
+      <li>
+        <a href="#one">
+          <h1>1. Botanical Garden</h1>
+        </a>
+      </li>
+      <li>
+        <a href="#two">
+          <h1>2. Quad</h1>
+        </a>
+      </li>
+      <li>
+        <a href="#three">
+          <h1>3. Panther</h1>
+        </a>
+      </li>
+      <li>
+        <a href="#four">
+          <h1>4. Chinese Clock</h1>
+        </a>
+      </li>
+      <li>
+        <a href="#five">
+          <h1>5. CIS</h1>
+        </a>
+      </li>
+      <li>
+        <a href="#six">
+          <h1>6. Engineering Complex</h1>
+        </a>
+      </li>
+      <li>
+        <a href="#seven">
+          <h1>7. All Faiths Center</h1>
+        </a>
+      </li>
+      <li>
+        <a href="#eight">
+          <h1>8. Panther Dining Hall</h1>
+        </a>
+      </li>
+    </ul>
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!-- end page Info -->
+
+  <!-- Page map -->
+  <!-- http://www.w3schools.com/googleapi/default.asp -->
+  <div data-role="page" id="map">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Dynamic Map</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+
+    <div class="ui-grid-c">
+      <div class="ui-block-a">
+        <button data-theme="b" onclick="getLocationMap();"> Show Map</button>
+      </div>
+    </div>
+    <!-- ui-grid -->
+    <br>
+
+    <p id="demo">Click the button to get your position on a map. You are the Purple Dot.</p>
+
+    <div id="mapholder"></div>
+
+    <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+
+    <script>
+      var x = document.getElementById("demo");
+      function getLocationMap() {
+          if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(showPosition, showError);
+          } else { 
+              x.innerHTML = "Geolocation is not supported by this browser.";
+          }
+      }
+      
+      function showPosition(position) {
+          lat = position.coords.latitude;
+          lon = position.coords.longitude;
+          latlon = new google.maps.LatLng(lat, lon)
+          mapholder = document.getElementById('mapholder')
+          mapholder.style.height = '700px';
+          mapholder.style.width = '590px';
+          latlon1 = new google.maps.LatLng(28.06621, -80.62289);
+          latlon2 = new google.maps.LatLng(28.067731, -80.623950);
+          latlon3 = new google.maps.LatLng(28.066541, -80.624143);
+          latlon4 = new google.maps.LatLng(28.066292, -80.624347);
+          latlon5 = new google.maps.LatLng(28.064583, -80.623876);
+          latlon6 = new google.maps.LatLng(28.062808, -80.624326);
+          latlon7 = new google.maps.LatLng(28.06001, -80.62366);
+          latlon8 = new google.maps.LatLng(28.062420, -80.622781);
+      
+          var myOptions = {
+          center:latlon,zoom:15,
+          mapTypeId:google.maps.MapTypeId.ROADMAP,
+          mapTypeControl:false,
+          navigationControlOptions:{style:google.maps.NavigationControlStyle.SMALL}
+          }
+          
+          var map = new google.maps.Map(document.getElementById("mapholder"), myOptions);
+          var marker = new google.maps.Marker({position:latlon,map:map,icon: ('http://maps.google.com/mapfiles/ms/icons/purple-dot.png'),title:"You are here!"});
+      
+      var marker = new google.maps.Marker({position:latlon1,map:map,icon: ('http://maps.google.com/mapfiles/ms/icons/blue-dot.png'), title:"Botanical Gardens"});
+      
+      var marker = new google.maps.Marker({position:latlon2,map:map,icon: ('http://maps.google.com/mapfiles/ms/icons/green-dot.png'),title:"Quad"});
+      
+      var marker = new google.maps.Marker({position:latlon3,map:map,icon: ('http://maps.google.com/mapfiles/ms/icons/red-dot.png'),title:"Panther"});
+      
+      var marker = new google.maps.Marker({position:latlon4,map:map,icon: ('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'),title:"Clock"});
+      
+      var marker = new google.maps.Marker({position:latlon5,map:map,icon: ('http://maps.google.com/mapfiles/ms/icons/green-dot.png'), title:"CIS"});
+      
+      var marker = new google.maps.Marker({position:latlon6,map:map,icon: ('http://maps.google.com/mapfiles/ms/icons/blue-dot.png'),title:"Complex"});
+      
+      var marker = new google.maps.Marker({position:latlon7,map:map,icon: ('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'),title:"Faith"});
+      
+      var marker = new google.maps.Marker({position:latlon8,map:map,icon: ('http://maps.google.com/mapfiles/ms/icons/red-dot.png'),title:"Dining"});
+      }
+      
+      function showError(error) {
+          switch(error.code) {
+              case error.PERMISSION_DENIED:
+                  x.innerHTML = "User denied the request for Geolocation."
+                  break;
+              case error.POSITION_UNAVAILABLE:
+                  x.innerHTML = "Location information is unavailable."
+                  break;
+              case error.TIMEOUT:
+                  x.innerHTML = "The request to get user location timed out."
+                  break;
+              case error.UNKNOWN_ERROR:
+                  x.innerHTML = "An unknown error occurred."
+                  break;
+          }
+      }
+    </script>
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photo" data-icon="photo">Photo</a>
+      <a href="#video" data-icon="video">Video</a>
+      <a href="#info" data-icon="info">Info</a>
+      <a href="#map" data-icon="map">Dynamic Map</a>
+    </div>
+  </div>
+  <!--end page map -->
+
+</body>
+
+</html>
+      

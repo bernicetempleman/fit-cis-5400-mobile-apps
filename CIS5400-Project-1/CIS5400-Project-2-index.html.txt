@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Workout Tracker</title>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" id="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+  <link rel="stylesheet" href="shareqr3.3.css" />
+  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+  <script src="shareqr3.3.js"></script>
+  <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+
+  <script type="text/javascript" charset="utf-8">
+    function onBodyLoad() 
+    {
+      //Let the user know we've launched
+      alert("onBodyLoad");
+      //Set the Cordova deviceready event listener,so we'll know
+      //when Cordova is ready
+      document.addEventListener("deviceready", onDeviceReady, false);
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function onDeviceReady() 
+    {
+      console.log("Entering onDeviceReady");
+      //Let the user know that the deviceReady event has fired
+      navigator.notification.alert("Cordova is ready", null, "Device Ready", "Continue");
+      console.log("Leaving onDeviceReady");
+    }
+
+      function takePhoto() {
+        console.log("Entering takePhoto");
+        navigator.camera.getPicture(cameraSuccess, cameraError1, {
+          quality : 50,
+          saveToPhotoAlbum : true,
+sourceType : Camera.PictureSourceType.CAMERA,
+          destinationType : Camera.DestinationType.FILE_URI
+        });
+        console.log("Leaving takePhoto");
+      }
+
+    function cameraSuccess(imageURL) 
+    {
+      console.log("Entering cameraSuccess");
+      console.log("Image URL: " + imageURL);
+        
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer8');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess0");
+    }
+
+      function cameraError1(e) {
+        console.log("Entering cameraError");
+        console.error(JSON.stringify(e));
+        navigator.notification.alert(JSON.stringify(e), null, "Camera Error", "Continue");
+        console.log("Leaving cameraError");
+      }
+ 
+ 
+    function takePhoto0() 
+    {
+      console.log("Entering takePhoto0");
+      var cameraOptions = 
+      {
+        quality : 50,
+        saveToPhotoAlbum : true,
+        destinationType : navigator.camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.CAMERA,     
+      };
+      navigator.camera.getPicture(cameraSuccess0, cameraError, cameraOptions);
+      console.log("Leaving takePhoto0");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto1() 
+    {
+      console.log("Entering takePhoto1");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      };
+      navigator.camera.getPicture(cameraSuccess1, cameraError, cameraOptions);
+      console.log("Leaving takePhoto1");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto2() 
+    {
+      console.log("Entering takePhoto2");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      };
+      navigator.camera.getPicture(cameraSuccess2, cameraError, cameraOptions);
+      console.log("Leaving takePhoto2");
+    }
+     
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto3() 
+    {
+      console.log("Entering takePhoto3");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      };
+      navigator.camera.getPicture(cameraSuccess3, cameraError, cameraOptions);
+      console.log("Leaving takePhoto3");
+    }
+    
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto4() 
+    {
+      console.log("Entering takePhoto4");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+       };
+       navigator.camera.getPicture(cameraSuccess4, cameraError, cameraOptions);
+       console.log("Leaving takePhoto4");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto5() 
+    {
+      console.log("Entering takePhoto5");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      };
+      navigator.camera.getPicture(cameraSuccess5, cameraError, cameraOptions);
+      console.log("Leaving takePhoto5");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto6() 
+    {
+      console.log("Entering takePhoto6");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      };
+      navigator.camera.getPicture(cameraSuccess6, cameraError, cameraOptions);
+      console.log("Leaving takePhoto6");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto7() 
+    {
+      console.log("Entering takePhoto7");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      };
+      navigator.camera.getPicture(cameraSuccess7, cameraError, cameraOptions);
+      console.log("Leaving takePhoto7");
+    }
+
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess0(imageURL) 
+    {
+      console.log("Entering cameraSuccess");
+      console.log("Image URL: " + imageURL);
+        
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer0');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess0");
+    }
+ 
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess1(imageURL) 
+    {
+      console.log("Entering cameraSuccess4");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer1');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+        console.log("Leaving cameraSuccess1");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess2(imageURL) 
+    {
+      console.log("Entering cameraSuccess");
+      console.log("Image URL: " + imageURL);
+        
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer2');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess2");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess3(imageURL) 
+    {
+      console.log("Entering cameraSuccess4");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer3');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess3");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess4(imageURL) 
+    {
+      console.log("Entering cameraSuccess");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer4');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess4");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess5(imageURL) 
+    {
+      console.log("Entering cameraSuccess4");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer5');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess5");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess6(imageURL) 
+    {
+      console.log("Entering cameraSuccess");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer6');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess6");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess7(imageURL) 
+    {
+      console.log("Entering cameraSuccess4");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer7');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess7");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraError(errObj) 
+    {
+      console.log("Entering cameraError");
+      console.error(JSON.stringify(errObj));
+      navigator.notification.alert(JSON.stringify(errObj), null, "Camera Error", "Continue");
+      console.log("Leaving cameraError");
+    }
+  </script>
+
+</head>
+<!--jQuery mobile examples, book examples and other websites -->
+<!--I modified some code I found in a tutorial for saving urls -->
+<!--save workouts instead -->
+<!-- https://ctoinsights.wordpress.com/2012/01/03/jquery-mobile-tutorial-part-iii-managing-data/ -->
+
+<body onload="onBodyLoad()">
+
+  <div data-role="page" id="home">
+
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Workouts</h1>
+      <a href="#addurl" data-icon="plus">Add Workout</a>
+    </div>
+
+    <div data-role="content">
+    </div>
+
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+  <!-- home -->
+
+  <div data-role="page" id="qrcode">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>QR Code</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+    </div>
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#about" data-icon="info">About</a>
+      <a href="photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+  <!-- qrcode -->
+
+  <div data-role="page" id="addurl">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Add Workout</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <form action="#home" method="POST" name="addurl" id="addurl">
+        <div data-role="fieldcontain">
+          <label for="url">Workout:</label>
+          <input type="url" name="url" id="url" value="" />
+          <button>Add</button>
+        </div>
+      </form>
+    </div>
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+  <!-- addurl -->
+
+  <div data-role="page" id="delurl">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <h1>Delete Workout?</h1>
+    </div>
+    <div data-role="content">
+      <p class="center" id="url_prompt">url</p>
+      <form action="#home" method="POST" name="delurl" id="delurl">
+        <div data-role="fieldcontain">
+          <input type="hidden" name="url_value" id="url_value" value="url" />
+          <fieldset class="ui-grid-a">
+            <div class="ui-block-a">
+              <a href="#home" data-role="button" class="ui-submit" data-rel="back" data-direction="reverse">Cancel</a>
+            </div>
+            <div class="ui-block-b">
+              <input type="submit" value="Delete" />
+            </div>
+          </fieldset>
+        </div>
+      </form>
+    </div>
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+    </div>
+  </div>
+  <!-- delurl -->
+
+  <div data-role="page" id="about">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>About</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <p>Keep track of your workouts.</p>
+    </div>
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+  <!-- about -->
+
+  <div data-role="page" id="photos">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Photo</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+
+    <div data-role="content">
+
+      <p> Select or Search for Day to add a photoor enter Your Stats:</p>
+
+      <ul data-role="listview" data-filter="true" data-input="#myFilter">
+        <li>
+          <a href="#monday">
+            <h1>Monday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#tuesday">
+            <h1>Tuesday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#wednesday">
+            <h1>Wednesday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#thursday">
+            <h1>Thursday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#friday">
+            <h1>Friday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#saturday">
+            <h1>Saturday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#sunday">
+            <h1>Sunday</h1>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- content -->
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+
+  <div data-role="page" id="monday">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Monday</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <p>Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto1();"> Album</button>
+      <br>
+      <div id="imageContainer1"></div>
+      <p>Enter & Submit Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Workout Time :</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories Burned:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Total Distance :</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--content  -->
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+  <!-- Page Monday -->
+
+  <div data-role="page" id="tuesday">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Tuesday</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <p>Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto2();"> Album</button>
+      <br>
+      <div id="imageContainer2"></div>
+      <p>Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Workout Time :</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories Burned:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Total Distance :</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+  <!-- Page Tuesday -->
+
+  <div data-role="page" id="wednesday">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Wednesday</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <p>Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto3();"> Album</button>
+      <br>
+      <div id="imageContainer3"></div>
+      <p>Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Workout Time :</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories Burned:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Total Distance :</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+  <!-- Page Wednesday -->
+
+  <div data-role="page" id="thursday">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Thursday</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <p>Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto4();"> Album</button>
+      <br>
+      <div id="imageContainer4"></div>
+      <p>Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Workout Time :</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories Burned:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Total Distance :</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+  <!-- Page Thursday -->
+
+  <div data-role="page" id="friday">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Friday</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <p>Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto5();"> Album</button>
+      <br>
+      <div id="imageContainer5"></div>
+      <p>Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Workout Time :</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories Burned:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Total Distance :</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+  <!-- Page Friday -->
+
+  <div data-role="page" id="saturday">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Saturday</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <p>Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto6();"> Album</button>
+      <br>
+      <div id="imageContainer6"></div>
+      <p>Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Workout Time :</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories Burned:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Total Distance :</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+  <!-- Page saturday -->
+
+  <div data-role="page" id="sunday">
+    <div data-role="header" data-theme="b" data-position="fixed">
+      <a href="#home" data-icon="home" data-iconpos="notext">Home</a>
+      <h1>Sunday</h1>
+      <a href="#home" data-icon="arrow-l" data-rel="back">Back</a>
+    </div>
+    <div data-role="content">
+      <p>Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto7();"> Album</button>
+      <br>
+      <div id="imageContainer7"></div>
+      <p>Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Workout Time :</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories Burned:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Total Distance :</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <div data-role="footer" class="ui-bar" data-theme="b" data-position="fixed" data-id="footer">
+      <a href="#home" data-icon="home">Home</a>
+      <a href="#about" data-icon="info">About</a>
+      <a href="#photos" data-icon="plus">Photos</a>
+    </div>
+  </div>
+  <!-- Page Sunday -->
+
+</body>
+
+</html>

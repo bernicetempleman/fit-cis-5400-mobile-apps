@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!--Bernice Templeman -->
+  <title>Cardio Tracker App</title>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" id="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+  <script src="http://code.jquery.com/jquery-1.11.3.min.js">
+  </script>
+  <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+  <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+
+  // example from book: Apache Cordova API Cookbook by John M Wargo
+  <script type="text/javascript" charset="utf-8">
+    function onBodyLoad() 
+    {
+      //Let the user know we've launched
+      alert("onBodyLoad");
+      //Set the Cordova deviceready event listener,so we'll know
+      //when Cordova is ready
+      document.addEventListener("deviceready", onDeviceReady, false);
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function onDeviceReady() 
+    {
+      console.log("Entering onDeviceReady");
+      //Let the user know that the deviceReady event has fired
+      navigator.notification.alert("Cordova is ready", null, "Device Ready", "Continue");
+      console.log("Leaving onDeviceReady");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto() 
+    {
+      console.log("Entering takePhoto");
+      navigator.camera.getPicture(cameraSuccess, cameraError, 
+      {
+        quality : 50,
+	  // saveToPhotoAlbum : true,
+        destinationType : Camera.DestinationType.FILE_URI
+      });
+      console.log("Leaving takePhoto");
+    }
+    
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto0() 
+    {
+      console.log("Entering takePhoto0");
+      var cameraOptions = 
+      {
+        sourceType : Camera.PictureSourceType.CAMERA,
+        destinationType : navigator.camera.DestinationType.FILE_URI,
+        saveToPhotoAlbum : true,
+        quality : 50,
+      };
+      navigator.camera.getPicture(cameraSuccess0, cameraError, cameraOptions);
+      console.log("Leaving takePhoto0");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto1() 
+    {
+      console.log("Entering takePhoto1");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      };
+      navigator.camera.getPicture(cameraSuccess1, cameraError, cameraOptions);
+      console.log("Leaving takePhoto1");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto2() 
+    {
+      console.log("Entering takePhoto2");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      }
+      navigator.camera.getPicture(cameraSuccess2, cameraError, cameraOptions);
+      console.log("Leaving takePhoto2");
+    }
+     
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto3() 
+    {
+      console.log("Entering takePhoto3");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      };
+      navigator.camera.getPicture(cameraSuccess3, cameraError, cameraOptions);
+      console.log("Leaving takePhoto3");
+    }
+    
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto4() 
+    {
+      console.log("Entering takePhoto4");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+       };
+       navigator.camera.getPicture(cameraSuccess4, cameraError, cameraOptions);
+       console.log("Leaving takePhoto4");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto5() 
+    {
+      console.log("Entering takePhoto5");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      };
+      navigator.camera.getPicture(cameraSuccess5, cameraError, cameraOptions);
+      console.log("Leaving takePhoto5");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto6() 
+    {
+      console.log("Entering takePhoto6");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      };
+      navigator.camera.getPicture(cameraSuccess6, cameraError, cameraOptions);
+      console.log("Leaving takePhoto6");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function takePhoto7() 
+    {
+      console.log("Entering takePhoto7");
+      var cameraOptions = 
+      {
+        quality : 50,
+        destinationType : Camera.DestinationType.FILE_URI,
+        sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM
+      };
+      navigator.camera.getPicture(cameraSuccess7, cameraError, cameraOptions);
+      console.log("Leaving takePhoto7");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess(res) 
+    {
+      console.log("Entering cameraSuccess");
+      console.log("Result: " + res);
+      navigator.notification.alert(res, null, "Camera", "Continue");
+      console.log("Leaving cameraSuccess");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess0(imageURL) 
+    {
+      console.log("Entering cameraSuccess");
+      console.log("Image URL: " + imageURL);
+        
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer0');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess0");
+    }
+ 
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess1(imageURL) 
+    {
+      console.log("Entering cameraSuccess4");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer1');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+        console.log("Leaving cameraSuccess1");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess2(imageURL) 
+    {
+      console.log("Entering cameraSuccess");
+      console.log("Image URL: " + imageURL);
+        
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer2');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess2");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess3(imageURL) 
+    {
+      console.log("Entering cameraSuccess4");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer3');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess3");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess4(imageURL) 
+    {
+      console.log("Entering cameraSuccess");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer4');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess4");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess5(imageURL) 
+    {
+      console.log("Entering cameraSuccess4");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer5');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess5");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess6(imageURL) 
+    {
+      console.log("Entering cameraSuccess");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer6');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess6");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraSuccess7(imageURL) 
+    {
+      console.log("Entering cameraSuccess4");
+      console.log("Image URL: " + imageURL);
+
+      //Get a handle to the image container div
+      ic = document.getElementById('imageContainer7');
+
+      //Then write an image tag out to the div using the
+      //URL we received from the camera application.
+      ic.innerHTML = '<img src="' + imageURL + '" width="50%" />';
+      console.log("Leaving cameraSuccess7");
+    }
+
+    // example from book: Apache Cordova API Cookbook by John M Wargo
+    function cameraError(errObj) 
+    {
+      console.log("Entering cameraError");
+      console.error(JSON.stringify(errObj));
+      navigator.notification.alert(JSON.stringify(errObj), null, "Camera Error", "Continue");
+      console.log("Leaving cameraError");
+    }
+  </script>
+</head>
+
+<!--jQuery mobile examples, book examples and other websites -->
+
+<body onload="onBodyLoad()">
+  <div data-role="page" id="home">
+    <div data-role="header">
+      <h1>Cardio Tracker App</h1>
+    </div>
+
+    <article data-role="content">
+      <p>1. Optional: Take a picture of your Cardio Stats:</p>
+      <button data-theme="d" onclick="takePhoto0();">Take Picture</button>
+      <br>
+
+      <div id="imageContainer0"></div>
+
+      <p>2. Select or Search for Day to Enter Your Stats:</p>
+      <form class="ui-filterable">
+        <input id="myFilter" data-type="search" placeholder="Search for day..">
+      </form>
+      <ul data-role="listview" data-filter="true" data-input="#myFilter">
+        <li>
+          <a href="#monday">
+            <h1>Monday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#tuesday">
+            <h1>Tuesday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#wednesday">
+            <h1>Wednesday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#thursday">
+            <h1>Thursday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#friday">
+            <h1>Friday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#saturday">
+            <h1>Saturday</h1>
+          </a>
+        </li>
+        <li>
+          <a href="#sunday">
+            <h1>Sunday</h1>
+          </a>
+        </li>
+      </ul>
+    </article>
+
+    <footer data-role="footer" data-position="fixed">
+      <nav data-role="navbar">
+        <ul>
+          <li><a href="#home" data-icon="home">Home</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+
+
+  <div data-role="page" id="monday">
+    <div data-role="header">
+      <a href="#home" data-icon="home" class="ui-btn-left">Home</a>
+      <h1>Monday</h1>
+    </div>
+    <div data-role="content">
+      <p>3. Optional: Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto1();"> Album</button>
+      <br>
+      <div id="imageContainer1"></div>
+      <p>4. Enter & Submit Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Time:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Distance:</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <footer data-role="footer" data-position="bottom">
+      <nav data-role="navbar">
+        <ul>
+          <li><a href="#home" data-icon="home">Home</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+  <!-- Page Monday -->
+
+  <div data-role="page" id="tuesday">
+    <div data-role="header">
+      <a href="#home" data-icon="home" class="ui-btn-left">Home</a>
+      <h1>Tuesday</h1>
+    </div>
+    <div data-role="content">
+      <p>3. Optional: Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto2();"> Album</button>
+      <br>
+      <div id="imageContainer2"></div>
+      <p>4. Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Time:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Distance:</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <footer data-role="footer" data-position="bottom">
+      <nav data-role="navbar">
+        <ul>
+          <li><a href="#home" data-icon="home">Home</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+  <!-- Page Tuesday -->
+
+  <div data-role="page" id="wednesday">
+    <div data-role="header">
+      <a href="#home" data-icon="home" class="ui-btn-left">Home</a>
+      <h1>Wednesday</h1>
+    </div>
+    <div data-role="content">
+      <p>3. Optional: Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto3();"> Album</button>
+      <br>
+      <div id="imageContainer3"></div>
+      <p>4. Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Time:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Distance:</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <footer data-role="footer" data-position="bottom">
+      <nav data-role="navbar">
+        <ul>
+          <li><a href="#home" data-icon="home">Home</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+  <!-- Page Wednesday -->
+
+  <div data-role="page" id="thursday">
+    <div data-role="header">
+      <a href="#home" data-icon="home" class="ui-btn-left">Home</a>
+      <h1>Thursday</h1>
+    </div>
+    <div data-role="content">
+      <p>3. Optional: Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto4();"> Album</button>
+      <br>
+      <div id="imageContainer4"></div>
+      <p>4. Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Time:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Distance:</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <footer data-role="footer" data-position="bottom">
+      <nav data-role="navbar">
+        <ul>
+          <li><a href="#home" data-icon="home">Home</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+  <!-- Page Thursday -->
+
+  <div data-role="page" id="friday">
+    <div data-role="header">
+      <a href="#home" data-icon="home" class="ui-btn-left">Home</a>
+      <h1>Friday</h1>
+    </div>
+    <div data-role="content">
+      <p>3. Optional: Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto5();"> Album</button>
+      <br>
+      <div id="imageContainer5"></div>
+      <p>4. Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Time:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Distance:</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <footer data-role="footer" data-position="bottom">
+      <nav data-role="navbar">
+        <ul>
+          <li><a href="#home" data-icon="home">Home</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+  <!-- Page Friday -->
+
+
+  <div data-role="page" id="saturday">
+    <div data-role="header">
+      <a href="#home" data-icon="home" class="ui-btn-left">Home</a>
+      <h1>Saturday</h1>
+    </div>
+    <div data-role="content">
+      <p>3. Optional: Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto6();"> Album</button>
+      <br>
+      <div id="imageContainer6"></div>
+      <p>4. Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Time:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Distance:</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <footer data-role="footer" data-position="bottom">
+      <nav data-role="navbar">
+        <ul>
+          <li><a href="#home" data-icon="home">Home</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+  <!-- Page saturday -->
+
+  <div data-role="page" id="sunday">
+    <div data-role="header">
+      <a href="#home" data-icon="home" class="ui-btn-left">Home</a>
+      <h1>Sunday</h1>
+    </div>
+    <div data-role="content">
+      <p>3. Optional: Select the picture of your stats:</p>
+      <button data-theme="d" onclick="takePhoto7();"> Album</button>
+      <br>
+      <div id="imageContainer7"></div>
+      <p>4. Enter & Save Your Stats:</p>
+      <h2>Add Note</h2>
+      <textarea id="noteText"></textarea>
+
+      <form method="post" action="demoform.asp">
+        <div class="ui-field-contain">
+
+          <label for="time">Time:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="calories">Calories:</label>
+          <input type="number" min="0" step="1" />
+
+          <label for="distance">Distance:</label>
+          <input type="number" min="0" step="1" />
+
+        </div>
+        <!-- class ui-field-contain -->
+        <input type="submit" value="Submit Button">
+      </form>
+    </div>
+    <!--  -->
+    <footer data-role="footer" data-position="bottom">
+      <nav data-role="navbar">
+        <ul>
+          <li><a href="#home" data-icon="home">Home</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+  <!-- Page Sunday -->
+
+</body>
+
+</html>
